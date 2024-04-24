@@ -1,0 +1,62 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="Gloom (generated)" id="1713433118651-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="BOOKS"/>
+            </not>
+        </preConditions>
+        <createTable tableName="BOOKS">
+            <column defaultValueComputed="RANDOM_UUID()" name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ORDERS"/>
+            </column>
+            <column name="TITLE" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="AUTHOR_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PUBLISH_DATE" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="BOOKS"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="Gloom (generated)" id="1713433118651-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="USERS"/>
+            </not>
+        </preConditions>
+        <createTable tableName="USERS">
+            <column defaultValueComputed="RANDOM_UUID()" name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_USER"/>
+            </column>
+            <column name="NAME" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMAIL" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="USERS"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="Gloom (generated)" id="1713433118651-3">
+        <addUniqueConstraint columnNames="EMAIL" constraintName="CONSTRAINT_4" tableName="USERS"/>
+    </changeSet>
+    <changeSet author="Gloom (generated)" id="1713433118651-4">
+        <createIndex indexName="FK_USERS_INDEX_8" tableName="BOOKS">
+            <column name="AUTHOR_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="Gloom (generated)" id="1713433118651-5">
+        <addForeignKeyConstraint baseColumnNames="AUTHOR_ID" baseTableName="BOOKS" constraintName="FK_USERS" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="USERS" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

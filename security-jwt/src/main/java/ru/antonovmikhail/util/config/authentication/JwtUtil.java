@@ -1,29 +1,35 @@
-package ru.antonovmikhail.jwt.authentication;
+package ru.antonovmikhail.util.config.authentication;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.stream.Collectors;
+
 
 public class JwtUtil {
-    private static final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    @Value("${spring.application.name}")
+    private static String appName;
 
-    public static String generateToken(UserDetails userDetails) throws UnsupportedEncodingException {
+    public static String generateToken(UserDetails userDetails) {
         // Логика генерации JWT
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(userDetails.getPassword());
-        SecretKey signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+        SecretKey signingKey = new SecretKeySpec(apiKeySecretBytes, Jwts.SIG.RS256.toString());
+        String scope = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(" "));
         return Jwts.builder()
                 .issuer("JwtApp")
                 .subject(userDetails.getUsername())
                 .claim("name", userDetails.getUsername())
                 .claim("password", userDetails.getPassword())
-                .claim("scope", userDetails.getAuthorities())
+                .claim("scope", scope)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.ofEpochSecond(Instant.now().getEpochSecond() + 72000)))
                 .signWith(signingKey)
@@ -33,7 +39,7 @@ public class JwtUtil {
     public static boolean validateToken(String token, UserDetails userDetails) {
         try {
             Jwts.parser()
-                    .requireIssuer("JwtApp")
+                    .requireIssuer(appName)
                     .verifyWith(generateKey(userDetails.getPassword()))
                     .build()
                     .parse(token);
@@ -45,7 +51,7 @@ public class JwtUtil {
 
     private static SecretKey generateKey(String password) {
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(password);
-        return new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+        return new SecretKeySpec(apiKeySecretBytes, Jwts.SIG.RS256.toString());
     }
 
 }

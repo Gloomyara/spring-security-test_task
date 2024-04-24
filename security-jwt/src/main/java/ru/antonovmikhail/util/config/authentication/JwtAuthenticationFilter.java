@@ -1,4 +1,4 @@
-package ru.antonovmikhail.jwt.authentication;
+package ru.antonovmikhail.util.config.authentication;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.antonovmikhail.jwt.authentication.exceptions.UserAuthenticationException;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -36,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
         } catch (ServletException | IOException e) {
-            throw new UserAuthenticationException(e.getMessage());
+            throw new RuntimeException();
         }
     }
 
