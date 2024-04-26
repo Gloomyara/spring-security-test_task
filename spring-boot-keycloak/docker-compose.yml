@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: postgres
+    image: library/postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: keycloak_db
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  keycloak_web:
+    image: quay.io/keycloak/keycloak:23.0.7
+    container_name: keycloak_web
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8484
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin_password
+    command: start-dev
+    ports:
+      - "8484:8080"
+    depends_on:
+      - postgres
+    links:
+      - "postgres:postgres"

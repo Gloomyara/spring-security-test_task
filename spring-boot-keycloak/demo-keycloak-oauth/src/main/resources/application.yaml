@@ -1,0 +1,17 @@
+server:
+  port: ${SERVER_PORT:8082}
+spring:
+  application.name: ${APPLICATION_NAME:spring-security-keycloak-oauth}
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8484/realms/my_realm
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: my_client
+            authorization-grant-type: authorization_code
+            scope: openid
+            client-secret:
